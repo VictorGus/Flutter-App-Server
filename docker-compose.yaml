@@ -1,26 +1,14 @@
-version: '2.0'
+version: '3'
 services:
   db:
-    image: "${PGIMAGE}"   
-    container_name: mobile-app-db 
+    image: 'mongo'
+    container_name: chat-db 
     ports:
-      - "${PGPORT}:5432"
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=chat-db
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
     volumes:
       - "./init:/docker-entrypoint-initdb.d"
-      - "./pgdata:/var/lib/postgresql/data"
-    environment:
-     POSTGRES_USER:     "${PGUSER}"
-     POSTGRES_PASSWORD: "${PGPASSWORD}"
-     POSTGRES_DB:       "${PGDATABASE}"
-
-  mobile-app:
-    image: "${APP_IMAGE}"
-    depends_on:
-      - db
-    links:
-      - "db:database"
-    ports:
-      - "9090:${APP_PORT}"
-    environment:
-     PGHOST: database 
-     PGPORT: 5432 
+      - "./mongo-volume:/data/db"

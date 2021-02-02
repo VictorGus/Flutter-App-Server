@@ -7,12 +7,14 @@
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.json   :refer [wrap-json-response wrap-json-body]]
             [app.dbcore  :as db]
+            [app.action  :as action]
             [org.httpkit.server :as server]
             [clojure.string     :as str])
   (:gen-class))
 
 (defn routes [ctx]
-  {"test" {:GET (fn [req] {:body {:message "Test"}})}})
+  {"test" {:GET action/chat-handler
+           :POST (action/create-message ctx)}})
 
 (defn params-to-keyword [params]
   (reduce-kv (fn [acc k v]
@@ -74,7 +76,7 @@
     (reset! state nil)))
 
 (defn start-server []
-  (let [app* (app db/pool-config)]
+  (let [app* (app {} #_db/pool-config)]
     (reset! state (server/run-server app* {:port 9090}))))
 
 (defn restart-server [] (stop-server) (start-server))
